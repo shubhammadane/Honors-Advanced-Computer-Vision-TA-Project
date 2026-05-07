@@ -1,0 +1,298 @@
+========================================
+PROJECT REPORT (10 PAGES)
+Real-Time Color-Based Object Tracking with Time Measurement (OpenCV + Tkinter)
+========================================
+
+------------------------------
+PAGE 1 OF 10 — TITLE PAGE
+------------------------------
+
+Project Title:
+Real-Time Color-Based Object Tracking with Time Measurement Using Computer Vision
+
+Submitted By:
+Name: ______________________________
+Roll No / ID: _______________________
+Class / Department: _________________
+
+Submitted To:
+Guide / Faculty: ____________________
+Department: _________________________
+Institute: __________________________
+
+Academic Year / Term:
+2025–2026
+
+Date:
+06 May 2026
+
+
+------------------------------
+PAGE 2 OF 10 — ABSTRACT
+------------------------------
+
+Abstract:
+This project implements a real-time, single-color object tracking system using a webcam feed. The user selects a target color from a predefined list, and the system detects the most prominent object of that color in the scene. The application continuously measures how long the object remains visible (tracking duration) and preserves the last visible duration when the object is lost. A sensitivity control is provided to filter small noisy detections based on contour area. The system includes an optional voice announcement that speaks the detected color when tracking starts. A desktop GUI presents the original camera feed, the tracked view with bounding box overlay, and a tracking info panel that highlights the current or last tracked time.
+
+Keywords:
+Computer Vision, OpenCV, HSV Color Space, Object Tracking, Contour Detection, Tkinter GUI, Real-Time Systems, Text-to-Speech
+
+
+------------------------------
+PAGE 3 OF 10 — INTRODUCTION
+------------------------------
+
+1. Introduction
+Computer vision enables computers to interpret and analyze image/video data. Color-based tracking is one of the simplest approaches when the target object is distinguishable by color. Direct RGB thresholding is sensitive to illumination changes; therefore, this project uses the HSV color space, which separates hue (color) from value (brightness) to improve stability in real scenes.
+
+2. Problem Statement
+Design and implement a real-time application that:
+- Captures live video from a webcam
+- Detects a user-selected color
+- Tracks the best matching object of that color (single-object approach)
+- Displays the time duration the object remains visible
+- Preserves and displays the “last tracked time” after the object disappears
+- Allows adjusting sensitivity to avoid noise and tiny detections
+- Provides a simple desktop UI for real-time operation
+
+3. Objectives
+Primary Objectives:
+- Reliable detection of a selected color using HSV thresholds
+- Track only the most significant object (largest contour) to avoid multiple-object confusion
+- Accurate tracking-time measurement while the object is visible
+
+Secondary Objectives:
+- Provide a clean GUI with two views (original and tracked)
+- Provide quick controls: color select, sensitivity slider, reset, quit
+- Provide voice feedback when detection begins (announced once per detection)
+
+
+------------------------------
+PAGE 4 OF 10 — BACKGROUND / THEORY
+------------------------------
+
+1. HSV Color Space
+HSV represents a color using:
+- Hue (H): identifies the base color
+- Saturation (S): intensity of the color
+- Value (V): brightness
+
+OpenCV uses H in the range 0–180 (instead of 0–360). HSV is commonly used for color segmentation because it is more robust than RGB under lighting variation.
+
+2. Color Segmentation (Thresholding)
+Color segmentation isolates pixels that fall within a predefined HSV range:
+- Convert frame from BGR to HSV
+- Apply thresholding using inRange() to create a binary mask
+- Mask pixels = 255 represent potential target regions
+
+3. Contours
+Contours are extracted from a binary image:
+- findContours() detects continuous boundaries in the mask
+- contourArea() estimates the size of each candidate region
+- boundingRect() provides a bounding box for visualization and object size measurement
+
+4. Single Best-Object Tracking
+To keep tracking stable and simple, the algorithm tracks only the largest valid contour. This reduces clutter and avoids tracking multiple small noisy blobs.
+
+
+------------------------------
+PAGE 5 OF 10 — SYSTEM REQUIREMENTS
+------------------------------
+
+1. Hardware Requirements
+- Windows PC/Laptop
+- Webcam (integrated or USB)
+- Recommended: 4 GB+ RAM, dual-core CPU or better
+
+2. Software Requirements
+- Windows OS
+- Python 3.x
+- Libraries used:
+  - OpenCV (cv2)
+  - NumPy
+  - Tkinter
+  - Pillow (PIL)
+  - pyttsx3
+
+3. Functional Requirements
+- Live webcam capture
+- Dropdown selection for target color
+- Detection of selected color using HSV segmentation
+- Track and display only the best object (largest contour)
+- Real-time duration while tracking
+- Preserve last tracking duration when object is lost
+- Sensitivity slider to set minimum contour area
+- Reset tracking button
+- Quit application button
+- Speak detected color once when detection begins
+
+4. Non-Functional Requirements
+- Near real-time responsiveness
+- Easy-to-use UI
+- Stable operation during object entry/exit
+- Clean resource handling (release camera on exit)
+
+
+------------------------------
+PAGE 6 OF 10 — SYSTEM DESIGN / ARCHITECTURE
+------------------------------
+
+1. High-Level Architecture
+The system follows this pipeline per frame:
+Camera → Frame Acquisition → HSV Conversion → Mask Creation → Contours
+→ Largest Contour Selection → Area Threshold Check → Timing Update
+→ Draw Bounding Box + Text → GUI Refresh
+
+2. Main Modules
+A) Video Capture
+- Uses cv2.VideoCapture with CAP_DSHOW
+- Sets frame size (640×480)
+
+B) Color Detection
+- Uses predefined HSV ranges for: Red, Green, Blue, Yellow, Orange, Purple, Pink, White, Black, Gray
+- Red uses two ranges due to HSV hue wrap-around
+- Combines ranges using mask OR operations
+
+C) Object Selection (Best Object)
+- Extracts external contours
+- Chooses max area contour
+- Accepts only if area > sensitivity threshold
+
+D) Timing & State Management
+- Starts timing on first detection
+- Updates duration while detected
+- Stores last_tracking_duration when object is lost
+
+E) GUI (Tkinter)
+- Displays original and tracked frames
+- Shows duration, status, and a scrollable info panel
+- Controls: color selection, sensitivity slider, reset, quit
+
+3. Key State Variables
+- selected_color: current dropdown selection
+- was_detected: tracks transition between not detected → detected
+- selected_color_start_time: time at which detection started
+- selected_color_duration: live duration
+- last_tracking_duration: saved duration after loss
+- announced: prevents repeated TTS for the same detection event
+
+
+------------------------------
+PAGE 7 OF 10 — METHODOLOGY / ALGORITHM
+------------------------------
+
+1. Input
+- Continuous frames from webcam
+
+2. Processing Steps (Per Frame)
+Step 1: Read frame from camera
+Step 2: Convert BGR → HSV
+Step 3: Build mask for selected color
+Step 4: Find contours in the mask
+Step 5: If contours exist:
+        - choose largest contour by area
+        - if area > sensitivity threshold: object is valid
+Step 6: Timing logic:
+        - If object valid and was_detected is False:
+          start timer, set was_detected True, announce color
+        - If object valid and was_detected is True:
+          update duration = now − start
+        - If object not valid and was_detected is True:
+          save last_tracking_duration, set was_detected False, reset current duration
+Step 7: Draw bounding box and overlay text on tracked frame
+Step 8: Update GUI images and text widgets
+
+3. Sensitivity Threshold
+- Sensitivity is an area filter (in pixels)
+- Higher values track only larger objects, reducing noise
+
+
+------------------------------
+PAGE 8 OF 10 — IMPLEMENTATION DETAILS
+------------------------------
+
+1. Technology Stack
+- Python for application logic
+- OpenCV for frame capture and vision processing
+- Tkinter for UI
+- Pillow for converting OpenCV frames to Tkinter-compatible images
+- pyttsx3 for offline TTS announcements
+
+2. GUI Implementation
+- Main window divided into left and right panels
+- Left shows original live frame
+- Right shows tracked frame with bounding box overlay
+- Top controls include color dropdown and status labels
+- Info panel shows:
+  - Tracking time (current or last)
+  - Color name
+  - Object size (width × height)
+  - Area
+
+3. Overlay Details
+- Bounding rectangle drawn using cv2.rectangle()
+- Color name placed near object
+- Timer text shown in top-left during tracking
+
+4. Threading for TTS
+- TTS runs in a separate daemon thread
+- Prevents UI freeze
+- Announced only once per detection event
+
+5. Resource Cleanup
+- on_closing() releases webcam and destroys the GUI window
+
+
+------------------------------
+PAGE 9 OF 10 — RESULTS, TESTING, AND USAGE
+------------------------------
+
+1. Results
+- System detects selected color regions in real time
+- Tracks the largest detected region as the primary object
+- Displays live tracking duration
+- Preserves last tracked time when object disappears
+
+2. Testing Scenarios
+- Color selection changes: detection updates for new color
+- Sensitivity adjustments:
+  - Low threshold: more detections (including small noise)
+  - High threshold: fewer detections (more stable)
+- Object entry/exit:
+  - Timer starts on entry, stops on exit, last time preserved
+- Reset:
+  - Clears time and state
+- Quit:
+  - Closes app and releases camera
+
+3. How to Run
+- Install dependencies (example):
+  pip install opencv-python numpy pillow pyttsx3
+- Run:
+  python app.py
+
+4. Limitations
+- Fixed HSV thresholds may be affected by strong lighting changes
+- Similar background colors can cause false detections
+- Designed to track a single best object only (largest contour)
+
+
+------------------------------
+PAGE 10 OF 10 — CONCLUSION, FUTURE SCOPE, REFERENCES
+------------------------------
+
+1. Conclusion
+This project provides a practical real-time solution for color-based single-object tracking. By using HSV segmentation and largest-contour selection, the system remains stable and avoids multi-object complexity. The timing feature accurately measures “time visible” and preserves the last tracked duration, making it useful for demonstrations and monitoring tasks.
+
+2. Future Scope
+- Add a color picker tool to calibrate HSV ranges dynamically
+- Apply morphological filtering (erode/dilate) to reduce noise
+- Show an optional mask preview for debugging
+- Add FPS display and performance statistics
+- Export tracking results (time history) to CSV
+
+3. References
+- OpenCV Documentation: VideoCapture, cvtColor, inRange, findContours
+- Python Tkinter Documentation
+- Pillow (PIL) Documentation
+- pyttsx3 Documentation
