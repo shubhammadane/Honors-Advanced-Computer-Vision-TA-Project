@@ -1,0 +1,7 @@
+gradio
+rembg
+onnxruntime
+numpy
+Pillow
+torch
+torchvision

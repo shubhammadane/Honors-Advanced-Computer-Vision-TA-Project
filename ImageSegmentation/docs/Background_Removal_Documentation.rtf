@@ -1,0 +1,70 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}}
+\fs24
+\b Background Removal Using Segmentation - Project Documentation\b0\par
+\par
+\b Student Name:\b0 Huzaif\par
+\b Date:\b0 May 6, 2026\par
+\b Project Type:\b0 Advanced Computer Vision - Background Removal\par
+\par
+\b 1. Abstract\b0\par
+This project performs background removal from images using a segmentation-based pipeline and provides a simple local web interface. The system accepts an input image, removes the background, and returns either a transparent PNG output or a white-background output.\par
+\par
+\b 2. Objectives\b0\par
+- Build a reliable background removal system.\par
+- Provide an easy-to-use web interface for non-technical users.\par
+- Ensure outputs are high quality on laptop hardware.\par
+\par
+\b 3. Tools and Technologies\b0\par
+- Python 3.x\par
+- Gradio (web UI)\par
+- rembg (segmentation and background removal)\par
+- onnxruntime (model runtime backend)\par
+- Pillow, NumPy\par
+\par
+\b 4. Project Workflow\b0\par
+1) User uploads an image in the web UI.\par
+2) The system runs segmentation to produce an alpha matte.\par
+3) The output is composed with either transparent or white background.\par
+4) The processed image is returned in the UI for download.\par
+\par
+\b 5. Project Structure\b0\par
+- app.py: Gradio UI entry point\par
+- src\\inference.py: Background removal logic\par
+- scripts\\download_model.py: Pre-download model weights\par
+- requirements.txt: Dependencies\par
+- assets\\: Optional sample data\par
+- outputs\\: Optional saved results\par
+\par
+\b 6. Installation Steps (Windows)\b0\par
+1) Create and activate a virtual environment.\par
+2) Install dependencies:\par
+   python -m pip install -r requirements.txt\par
+\par
+\b 7. How to Run\b0\par
+- Start the app:\par
+  python app.py\par
+- Optional: Pre-download model weights:\par
+  python scripts\\download_model.py\par
+\par
+\b 8. Output and Results\b0\par
+The project generates background-removed images with clean edges for typical photos. Output can be transparent PNG or white background images depending on user selection.\par
+\par
+\b 9. Screenshots and Evidence\b0\par
+Screenshots are available in the following folder:\par
+C:\\Users\\ASUS\\OneDrive\\Documents\\Pictures\\Screenshots\par
+(Images include UI view, input image, and output results.)\par
+\par
+\b 10. Challenges and Fixes\b0\par
+- Python environment mismatch was resolved by using a virtual environment.\par
+- Missing dependencies were resolved by updating requirements and reinstalling.\par
+\par
+\b 11. Future Improvements\b0\par
+- Batch image processing\par
+- Custom background replacement\par
+- Edge refinement and feathering controls\par
+- API endpoint for integration\par
+\par
+\b 12. Conclusion\b0\par
+The system successfully removes image backgrounds using segmentation, provides a simple UI, and runs efficiently on laptop hardware. The project meets the documentation requirements with clear workflow, code structure, and output evidence.\par
+}
