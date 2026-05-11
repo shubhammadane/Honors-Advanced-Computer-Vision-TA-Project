@@ -1,27 +1,9 @@
-# Python
-venv/
 __pycache__/
 *.pyc
-.env
-.ipynb_checkpoints/
-*.h5
-*.weights
-
-# Node
-node_modules/
-dist/
-dist-ssr/
-*.local
-
-# IDEs
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Project specific
-backend/venv/
-frontend/node_modules/
-frontend/dist/
+.venv/
+venv/
+.cache_home/
+outputs/
+runs/
+weights/
+custom_*.pt

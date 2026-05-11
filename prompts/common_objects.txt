@@ -1,0 +1,19 @@
+person
+bottle
+pen
+mobile phone
+chair
+laptop
+computer monitor
+keyboard
+mouse
+book
+cup
+backpack
+handbag
+table
+desk
+tv
+remote
+clock
+
